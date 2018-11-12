@@ -22,10 +22,14 @@ RUN apt-get update && \
     apt-get upgrade -y && \ 	
     apt-get install -y \
 	git \
-	python3 \
-	python3-dev \
-	python3-setuptools \
-	python3-pip \
+#	python3 \
+#	python3-dev \
+#	python3-setuptools \
+#	python3-pip \
+	python \
+	python-dev \
+	python-setuptools \
+	python-pip \
 	nginx \
 	supervisor \
 	sqlite3 && \
