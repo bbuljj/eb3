@@ -1,30 +1,57 @@
-FROM ubuntu
-MAINTAINER Andrew Smiley
-# Update packages
-RUN apt-get update -y
+# Copyright 2013 Thatcher Peskens
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-# Install Python Setuptools and some other fancy tools for working we this container if we choose to attach to it
-RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential
-RUN apt-get install -y python python-dev python-distribute python-pip supervisor
+FROM ubuntu:16.04
 
-# copy the contents of this directory over to the container at location /src
-ADD . /src
+MAINTAINER Dockerfiles
 
+# Install required packages and remove the apt packages cache when done.
 
-# Add and install Python modules
-#we shouldn't have to do this twice but that's how the folks over at amazon suggested.
-# we'd probably be fine with just ADD . /src
-ADD requirements.txt /src/requirements.txt
-RUN cd /src && pip install -r /src/requirements.txt
-RUN cd /src && pip install uwsgi
+RUN apt-get update && \
+    apt-get upgrade -y && \ 	
+    apt-get install -y \
+	git \
+	python3 \
+	python3-dev \
+	python3-setuptools \
+	python3-pip \
+	nginx \
+	supervisor \
+	sqlite3 && \
+	pip install -U pip setuptools && \
+   rm -rf /var/lib/apt/lists/*
 
+# install uwsgi now because it takes a little while
+RUN pip install uwsgi
 
-###############################################################################################################################################################
-# This is the important part. The port we are exposing needs to match the port we are binding GUNICORN too. See the supervisord.conf file for the proper conf #
-###############################################################################################################################################################
-EXPOSE  8002
-#set the working directorly
-WORKDIR /src
+# setup all the configfiles
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+COPY nginx-app.conf /etc/nginx/sites-available/default
+COPY supervisor-app.conf /etc/supervisor/conf.d/
 
-#basically this is the command to execute when we run the contaner. This is the default for sudo docker run for this image
-CMD supervisord -c /src/supervisord.conf
+# COPY requirements.txt and RUN pip install BEFORE adding the rest of your code, this will cause Docker's caching mechanism
+# to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
+
+COPY app/requirements.txt /home/docker/code/app/
+RUN pip install -r /home/docker/code/app/requirements.txt
+
+# add (the rest of) our code
+COPY . /home/docker/code/
+
+# install django, normally you would remove this step because your project would already
+# be installed in the code/app/ directory
+#RUN django-admin.py startproject website /home/docker/code/app/
+
+EXPOSE 80
+CMD ["supervisord", "-n"]
