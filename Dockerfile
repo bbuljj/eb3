@@ -28,4 +28,4 @@ WORKDIR /src
 
 #basically this is the command to execute when we run the contaner. This is the default for sudo docker run for this image
 CMD supervisord -c /src/supervisord.conf
-CMD ["/usr/local/bin/uwsgi", "--ini", "/src/eb.ini"]
+
