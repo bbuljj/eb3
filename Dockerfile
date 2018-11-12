@@ -47,8 +47,8 @@ COPY supervisor-app.conf /etc/supervisor/conf.d/
 # COPY requirements.txt and RUN pip install BEFORE adding the rest of your code, this will cause Docker's caching mechanism
 # to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
 
-COPY app/requirements.txt /home/docker/code/app/
-RUN pip install -r /home/docker/code/app/requirements.txt
+COPY requirements.txt /home/docker/code/
+RUN pip install -r /home/docker/code/requirements.txt
 
 # add (the rest of) our code
 COPY . /home/docker/code/
