@@ -24,7 +24,9 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'dev-env3.8me4fynz23.ap-northeast-2.elasticbeanstalk.com',
+]
 
 # Application definition
 
