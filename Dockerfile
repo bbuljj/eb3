@@ -16,6 +16,8 @@ ADD . /src
 # we'd probably be fine with just ADD . /src
 ADD requirements.txt /src/requirements.txt
 RUN cd /src && pip install -r /src/requirements.txt
+RUN cd /src && pip install uwsgi
+
 
 ###############################################################################################################################################################
 # This is the important part. The port we are exposing needs to match the port we are binding GUNICORN too. See the supervisord.conf file for the proper conf #
