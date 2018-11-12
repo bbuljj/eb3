@@ -1,10 +1,10 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
+from smarturls import surl
 
-urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'django_eb.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+from blog.views import BlogAPIView
 
-    url(r'^admin/', include(admin.site.urls)),
-)
+urlpatterns = [
+    surl('admin/', include(admin.site.urls)),
+    surl('blog/', BlogAPIView.as_view(), name='blog')
+]
